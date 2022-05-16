@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<#assign externalKeyParam = "&amp;externalLoginKey=" + requestAttributes.externalLoginKey!>
+<#assign externalKeyParam = "">
 <div class="screenlet">
   <#if product??>
     <div class="screenlet-title-bar">

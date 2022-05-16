@@ -63,7 +63,7 @@ under the License.
     </request-map>
 
     <request-map uri="ping">
-        <security auth="true"/>
+        <security auth="false"/>
         <event type="service" invoke="ping"/>
         <response name="error" type="view" value="ping"/>
         <response name="success" type="view" value="ping"/>

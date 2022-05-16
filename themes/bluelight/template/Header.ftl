@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<#assign externalKeyParam = "&amp;externalLoginKey=" + requestAttributes.externalLoginKey!>
+<#assign externalKeyParam = "">
 
 <#if (requestAttributes.person)??><#assign person = requestAttributes.person></#if>
 <#if (requestAttributes.partyGroup)??><#assign partyGroup = requestAttributes.partyGroup></#if>

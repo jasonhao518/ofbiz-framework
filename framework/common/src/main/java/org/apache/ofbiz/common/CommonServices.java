@@ -504,12 +504,12 @@ public class CommonServices {
             return ServiceUtil.returnError(UtilProperties.getMessage(resource, "CommonPingDatasourceCannotConnect", locale));
         }
 
-        if (count != 0L) {
+//        if (count != 0L) {
             Map<String, Object> result = ServiceUtil.returnSuccess();
             result.put("message", message);
             return result;
-        }
-        return ServiceUtil.returnError(UtilProperties.getMessage(resource, "CommonPingDatasourceInvalidCount", locale));
+//        }
+//        return ServiceUtil.returnError(UtilProperties.getMessage(resource, "CommonPingDatasourceInvalidCount", locale));
     }
 
     public static Map<String, Object> getAllMetrics(DispatchContext dctx, Map<String, ?> context) {

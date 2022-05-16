@@ -240,7 +240,14 @@ public class RequestHandler {
     public void doRequest(HttpServletRequest request, HttpServletResponse response, String chain,
             GenericValue userLogin, Delegator delegator) throws RequestHandlerException, RequestHandlerExceptionAllowExternalRequests {
 
-        if (!hostHeadersAllowed.contains(request.getServerName())) {
+    	boolean match = false;
+    	for(String hostHeader:hostHeadersAllowed) {
+	        if (request.getServerName().equalsIgnoreCase(hostHeader) || request.getServerName().matches(hostHeader.replaceAll("\\.","\\\\.").replaceAll("\\*",".*"))) {
+                match = true;
+                break;
+	        }
+    	}
+        if (!match) {
             Debug.logError("Domain " + request.getServerName() + " not accepted to prevent host header injection."
                     + " You need to set host-headers-allowed property in security.properties file.", module);
             throw new RequestHandlerException("Domain " + request.getServerName() + " not accepted to prevent host header injection."

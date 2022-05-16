@@ -50,6 +50,7 @@ import org.apache.ofbiz.base.util.collections.ResourceBundleMapWrapper;
 import org.apache.ofbiz.base.util.string.FlexibleStringExpander;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.apache.commons.text.StringSubstitutor;
 
 /** Generic Property Accessor with Cache - Utilities for working with properties files.
  * <p>UtilProperties divides properties files into two classes: non-locale-specific -
@@ -280,6 +281,9 @@ public final class UtilProperties implements Serializable {
 
         try {
             value = properties.getProperty(name);
+            if( value != null ) {
+                value = new StringSubstitutor(System.getenv()).replace(value);
+            }
         } catch (Exception e) {
             Debug.logInfo(e, module);
         }
