@@ -173,7 +173,6 @@
             <link target="/ordermgr/control/FindRequest" url-mode="inter-app">
                 <parameter param-name="lookupFlag" value="Y"/>
                 <parameter param-name="fromPartyId" from-field="partyId"/>
-                <parameter param-name="externaLoginKey" from-field="externalLoginKey"/>
             </link>
         </menu-item>
         <menu-item name="findQuote" title="${uiLabelMap.OrderOrderQuotes}" >
@@ -182,7 +181,6 @@
             </condition>
             <link target="/ordermgr/control/FindQuote" url-mode="inter-app">
                 <parameter param-name="partyId"/>
-                <parameter param-name="externalLoginKey"/>
             </link>
         </menu-item>
         <menu-item name="searchOrder" title="${uiLabelMap.OrderOrders}" >
@@ -193,7 +191,6 @@
                 <parameter param-name="lookupFlag" value="Y"/>
                 <parameter param-name="hideFields" value="Y"/>
                 <parameter param-name="partyId"/>
-                <parameter param-name="externalLoginKey"/>
                 <parameter param-name="viewIndex" value="1"/>
                 <parameter param-name="viewSize" value="20"/>
             </link>
@@ -204,7 +201,6 @@
             </condition>
             <link target="/ordermgr/control/EditQuote" url-mode="inter-app">
                 <parameter param-name="partyId"/>
-                <parameter param-name="externaLoginKey" from-field="externalLoginKey"/>
             </link>
         </menu-item>
         <menu-item name="newOrder" title="${uiLabelMap.OrderNewOrder}">
@@ -213,7 +209,6 @@
             </condition>
             <link target="/ordermgr/control/checkinits" url-mode="inter-app">
                 <parameter param-name="partyId"/>
-                <parameter param-name="externaLoginKey" from-field="externalLoginKey"/>
             </link>
         </menu-item>
     </menu>

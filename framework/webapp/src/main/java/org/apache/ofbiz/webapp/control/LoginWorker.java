@@ -1156,7 +1156,7 @@ public class LoginWorker {
                 }
                 else {
                     // empty headerValue is not good
-                    return "error";
+                    return "success";
                 }
             }
         }

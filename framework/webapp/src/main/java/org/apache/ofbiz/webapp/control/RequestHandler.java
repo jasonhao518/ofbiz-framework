@@ -447,7 +447,7 @@ public class RequestHandler {
                         interruptRequest = true;
                     } else if (!"success".equalsIgnoreCase(returnString)) {
                         if (!returnString.contains(":_protect_:")) {
-                            throw new EventHandlerException("Pre-Processor event [" + event.invoke + "] did not return 'success'.");
+                            throw new EventHandlerException("Pre-Processor event [" + event.invoke + "] did not return 'success'."+path);
                         } else { // protect the view normally rendered and redirect to error response view
                             returnString = returnString.replace(":_protect_:", "");
                             if (returnString.length() > 0) {

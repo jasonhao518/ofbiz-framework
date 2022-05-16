@@ -1,6 +1,6 @@
 package org.apache.ofbiz.base.config;
 
-import java.util.Arrays;
+import java.time.Duration;
 
 import org.apache.ofbiz.entity.util.EntityUtilProperties;
 import org.springframework.cache.CacheManager;
@@ -9,13 +9,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.RedisPassword;
+import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 
-import io.lettuce.core.ReadFrom;
+import io.lettuce.core.ClientOptions;
+import io.lettuce.core.SocketOptions;
+import io.lettuce.core.TimeoutOptions;
 
 @Configuration
 @EnableCaching
@@ -27,18 +28,33 @@ public class RedisConfig {
 //				"redis-master.default", 6379);
 //		configuration.addNode("redis-replicas.default", 6379);
 		boolean standalone = EntityUtilProperties.propertyValueEquals("general", "redis.type", "standalone");
-		LettuceConnectionFactory factory = null;
-		if(standalone) {
-			factory = new LettuceConnectionFactory();
-		}else {
-			RedisClusterConfiguration configuration = new RedisClusterConfiguration(Arrays.asList("redis-redis-cluster-headless:6379"));
-			
-			configuration.setPassword("");
-			LettuceClientConfiguration clientConfig = LettucePoolingClientConfiguration.builder().readFrom(ReadFrom.ANY).build();
-            factory = new LettuceConnectionFactory(configuration,clientConfig);
-		}
 
-		return factory;
+			RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration()
+			        .master("mymaster")
+			        .sentinel("redis-node-0.redis-headless.db.svc.cluster.local", 26379)
+			        .sentinel("redis-node-1.redis-headless.db.svc.cluster.local", 26379)
+			        .sentinel("redis-node-2.redis-headless.db.svc.cluster.local", 26379);
+			sentinelConfig.setPassword(RedisPassword.of(""));
+			sentinelConfig.setSentinelPassword(RedisPassword.of(""));
+			sentinelConfig.setDatabase(1);
+
+			SocketOptions socketOptions = SocketOptions.builder()
+			        .connectTimeout(Duration.ofSeconds(30L))
+			        .build();
+
+			ClientOptions clientOptions = ClientOptions.builder()
+			        .socketOptions(socketOptions)
+			        .timeoutOptions(TimeoutOptions.enabled())
+			        .build();
+
+			LettuceClientConfiguration lettuceClientConfiguration = LettuceClientConfiguration.builder()
+			        .commandTimeout(Duration.ofSeconds(30L))
+			        .clientOptions(clientOptions)
+			        .build();
+
+
+			return new LettuceConnectionFactory(sentinelConfig, lettuceClientConfiguration);
+	
 	}
 	
 	@Bean

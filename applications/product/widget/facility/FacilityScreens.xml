@@ -772,7 +772,6 @@ under the License.
                                     <link target="/workeffort/control/calendar" text="${uiLabelMap.CommonViewCalendar}" url-mode="inter-app">
                                         <parameter param-name="period" value="month"/>
                                         <parameter param-name="facilityId"/>
-                                        <parameter param-name="externalLoginKey"/>
                                     </link>
                                     <section>
                                         <condition>

@@ -584,15 +584,15 @@ public class CatalinaContainer implements Container {
         context.addFilterMap(sessionFilterMap);
         
 
-        FilterDef securityFilterDef = new FilterDef();
-        securityFilterDef.setFilterClass(DelegatingFilterProxy.class.getName());
-        securityFilterDef.setFilterName("springSecurityFilterChain");
-        context.addFilterDef(securityFilterDef);
-
-        FilterMap securityFilterMap = new FilterMap();
-        securityFilterMap.setFilterName("springSecurityFilterChain");
-        securityFilterMap.addURLPattern("*");
-        context.addFilterMap(securityFilterMap);
+//        FilterDef securityFilterDef = new FilterDef();
+//        securityFilterDef.setFilterClass(DelegatingFilterProxy.class.getName());
+//        securityFilterDef.setFilterName("springSecurityFilterChain");
+//        context.addFilterDef(securityFilterDef);
+//
+//        FilterMap securityFilterMap = new FilterMap();
+//        securityFilterMap.setFilterName("springSecurityFilterChain");
+//        securityFilterMap.addURLPattern("*");
+//        context.addFilterMap(securityFilterMap);
 
         Map<String, String> initParameters = appInfo.getInitParameters();
         // request dumper filter

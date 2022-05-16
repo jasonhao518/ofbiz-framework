@@ -41,7 +41,7 @@ public class RootCookieSerializer implements CookieSerializer {
 
 	private Clock clock = Clock.systemUTC();
 
-	private String cookieName = "session";
+	private String cookieName = "OFBIZSESSION";
 
 	private Boolean useSecureCookie;
 
