@@ -37,6 +37,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.commons.text.StringSubstitutor;
 import org.apache.ofbiz.base.location.FlexibleLocation;
 import org.apache.ofbiz.base.util.Base64;
 import org.apache.ofbiz.base.util.Debug;
@@ -561,6 +562,7 @@ public class EntitySaxReader extends DefaultHandler {
                     try {
                         // treat empty strings as nulls, but do NOT ignore them, instead set as null and update
                         if (value != null) {
+                        	value = new StringSubstitutor(System.getenv(),"@","@").replace(value);
                             if (currentValue.getModelEntity().isField(name.toString())) {
                                 String valueString = (value.length() > 0 ? value.toString() : null);
                                 currentValue.setString(name.toString(), valueString);

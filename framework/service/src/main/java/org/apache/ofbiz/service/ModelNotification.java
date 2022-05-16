@@ -19,6 +19,7 @@
 
 package org.apache.ofbiz.service;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,7 @@ import org.apache.ofbiz.service.config.model.Notify;
 /**
  * ModelNotification
  */
-public class ModelNotification {
+public class ModelNotification implements Serializable{
 
     public static final String module = ModelNotification.class.getName();
 

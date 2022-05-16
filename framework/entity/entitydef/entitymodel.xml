@@ -82,9 +82,9 @@ under the License.
         </description>
         <field name="tenantId" type="id"/>
         <field name="entityGroupName" type="name"/>
-        <field name="jdbcUri" type="long-varchar"/>
-        <field name="jdbcUsername" type="long-varchar"/>
-        <field name="jdbcPassword" type="long-varchar">
+        <field name="jdbcUri" type="long-varchar" encrypt="true"/>
+        <field name="jdbcUsername" type="long-varchar" encrypt="true"/>
+        <field name="jdbcPassword" type="long-varchar" encrypt="true">
             <!-- This field should probably be encrypted, but the encrypt=true attribute will not work in this case
             because different tenants will have different sets of encryption keys because the EntityKeyStore table is
             in the per-tenant database an not in the shared tenant control database, which causes different keys to

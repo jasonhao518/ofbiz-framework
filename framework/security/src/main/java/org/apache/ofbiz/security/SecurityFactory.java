@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.apache.ofbiz.security;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -32,6 +33,7 @@ import org.apache.ofbiz.base.util.Debug;
 import org.apache.ofbiz.base.util.UtilMisc;
 import org.apache.ofbiz.base.util.cache.UtilCache;
 import org.apache.ofbiz.entity.Delegator;
+import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
 import org.apache.ofbiz.entity.GenericValue;
 import org.apache.ofbiz.entity.condition.EntityCondition;
@@ -83,9 +85,10 @@ public final class SecurityFactory {
 
     private SecurityFactory() {}
 
-    private static final class OFBizSecurity implements Security {
+    private static final class OFBizSecurity implements Security,Serializable {
 
-        private Delegator delegator = null;
+        private transient Delegator delegator = null;
+        private String delegatorName;
 
         private static final Map<String, Map<String, String>> simpleRoleEntity = UtilMisc.toMap(
             "ORDERMGR", UtilMisc.<String, String>toMap("name", "OrderRole", "pkey", "orderId"),
@@ -97,14 +100,14 @@ public final class SecurityFactory {
         @Override
         public void clearUserData(GenericValue userLogin) {
             if (userLogin != null) {
-                delegator.getCache().remove("UserLoginSecurityGroup", EntityCondition.makeCondition("userLoginId", EntityOperator.EQUALS, userLogin.getString("userLoginId")));
+            	getDelegator().getCache().remove("UserLoginSecurityGroup", EntityCondition.makeCondition("userLoginId", EntityOperator.EQUALS, userLogin.getString("userLoginId")));
             }
         }
 
         @Deprecated
         public Iterator<GenericValue> findUserLoginSecurityGroupByUserLoginId(String userLoginId) {
             try {
-                List<GenericValue> collection = EntityUtil.filterByDate(EntityQuery.use(delegator).from("UserLoginSecurityGroup").where("userLoginId", userLoginId).cache(true).queryList());
+                List<GenericValue> collection = EntityUtil.filterByDate(EntityQuery.use(getDelegator()).from("UserLoginSecurityGroup").where("userLoginId", userLoginId).cache(true).queryList());
                 return collection.iterator();
             } catch (GenericEntityException e) {
                 Debug.logWarning(e, module);
@@ -114,7 +117,11 @@ public final class SecurityFactory {
 
         @Deprecated
         public Delegator getDelegator() {
-            return this.delegator;
+        	if(this.delegator!=null) {
+        		return this.delegator;
+        	}else {
+        		return DelegatorFactory.getDelegator(delegatorName);
+        	}
         }
 
         @Override
@@ -263,7 +270,7 @@ public final class SecurityFactory {
         @Deprecated
         public boolean securityGroupPermissionExists(String groupId, String permission) {
             try {
-                return EntityQuery.use(delegator).from("SecurityGroupPermission").where("groupId", groupId, "permissionId", permission).cache(true).filterByDate().queryFirst() != null;
+                return EntityQuery.use(getDelegator()).from("SecurityGroupPermission").where("groupId", groupId, "permissionId", permission).cache(true).filterByDate().queryFirst() != null;
             } catch (GenericEntityException e) {
                 Debug.logWarning(e, module);
                 return false;
@@ -277,6 +284,7 @@ public final class SecurityFactory {
             }
             Assert.notNull("delegator", delegator);
             this.delegator = delegator;
+            this.delegatorName = delegator.getDelegatorName();
         }
     }
 }

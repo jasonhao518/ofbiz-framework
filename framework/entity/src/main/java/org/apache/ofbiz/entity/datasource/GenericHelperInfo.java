@@ -19,6 +19,8 @@
 
 package org.apache.ofbiz.entity.datasource;
 
+import java.io.Serializable;
+
 /**
  * A container for datasource connection information.
  * <p><b>Note that this class is not synchronized.</b>
@@ -26,7 +28,7 @@ package org.apache.ofbiz.entity.datasource;
  * </p> 
  *
  */
-public final class GenericHelperInfo {
+public final class GenericHelperInfo implements Serializable{
     private final String entityGroupName;
     private final String helperBaseName;
     private String tenantId = "";

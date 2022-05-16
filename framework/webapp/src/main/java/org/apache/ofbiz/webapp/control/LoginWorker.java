@@ -775,8 +775,8 @@ public class LoginWorker {
         request.setAttribute("security", security);
 
         session.setAttribute("delegatorName", delegator.getDelegatorName());
-        session.setAttribute("delegator", delegator);
-        session.setAttribute("dispatcher", dispatcher);
+//        session.setAttribute("delegator", delegator);
+//        session.setAttribute("dispatcher", dispatcher);
         session.setAttribute("security", security);
 
         // get rid of the visit info since it was pointing to the previous database, and get a new one
@@ -876,6 +876,7 @@ public class LoginWorker {
         if (request.getAttribute("_AUTO_LOGIN_LOGOUT_") == null) {
             return autoLoginCheck(request, response);
         }
+        request.changeSessionId();
         return "success";
     }
 

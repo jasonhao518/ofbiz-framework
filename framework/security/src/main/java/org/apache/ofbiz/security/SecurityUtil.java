@@ -90,7 +90,7 @@ public final class SecurityUtil {
      * @param delegator
      * @param userLoginId
      * @param toUserLoginId
-     * @return List
+     * @return List<String>
      */
     public static List<String> hasUserLoginMorePermissionThan(Delegator delegator, String userLoginId, String toUserLoginId) {
         ArrayList<String> returnList = new ArrayList<>();

@@ -67,7 +67,7 @@ function insertImageName(size,nameValue) {
               <input name="fromDate" type="hidden" value="${productContent.fromDate}"/>
               <input type="submit" value="${uiLabelMap.CommonDelete}"/>
             </form>
-            <td><a href="/content/control/EditContent?contentId=${productContent.contentId}&amp;externalLoginKey=${requestAttributes.externalLoginKey!}" class="buttontext">${uiLabelMap.ProductEditContent} ${entry.content.contentId}</td>
+            <td><a href="/content/control/EditContent?contentId=${productContent.contentId}" class="buttontext">${uiLabelMap.ProductEditContent} ${entry.content.contentId}</td>
          </tr>
          <#-- toggle the row color -->
          <#if "2" == rowClass>

@@ -19,10 +19,12 @@
 
 package org.apache.ofbiz.service;
 
+import java.io.Serializable;
+
 /**
  * ModelServiceIface
  */
-public class ModelServiceIface {
+public class ModelServiceIface implements Serializable{
 
     protected String service;
     protected boolean optional;

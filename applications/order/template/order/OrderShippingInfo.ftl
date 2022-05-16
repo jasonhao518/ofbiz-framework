@@ -125,7 +125,7 @@ under the License.
               </#if>
               <#if orderHeader.statusId != "ORDER_COMPLETED">
                   <li>
-                    <form action="<@ofbizUrl>completePurchaseOrder?externalLoginKey=${externalLoginKey}</@ofbizUrl>" method="post">
+                    <form action="<@ofbizUrl>completePurchaseOrder</@ofbizUrl>" method="post">
                      <input type="hidden" name="orderId" value="${orderId}"/>
                     <select name="facilityId">
                       <#list ownedFacilities as facility>
@@ -260,15 +260,15 @@ under the License.
                   <div class="tabletext"> [${OISG.shipGroupSeqId}] <#if OISG.shipByDate?has_content>, ${uiLabelMap.OrderShipBeforeDate} : ${OISG.shipByDate?date}</#if></div>
                       <#if "SALES_ORDER" == orderType>
                           <#list orderShipments as orderShipment>
-                  <div>${uiLabelMap.OrderPlannedInShipment} : </b><a target="facility" href="/facility/control/ViewShipment?shipmentId=${orderShipment.shipmentId!}&externalLoginKey=${externalLoginKey}" class="buttontext" style="font-size: xx-small;">${orderShipment.shipmentId!}</a>:${orderShipment.shipmentItemSeqId!} - ${orderShipment.quantity!}</div>
+                  <div>${uiLabelMap.OrderPlannedInShipment} : </b><a target="facility" href="/facility/control/ViewShipment?shipmentId=${orderShipment.shipmentId!}" class="buttontext" style="font-size: xx-small;">${orderShipment.shipmentId!}</a>:${orderShipment.shipmentItemSeqId!} - ${orderShipment.quantity!}</div>
                           </#list>
                       <#elseif "PURCHASE_ORDER" == orderType>
                           <#list orderShipments as orderShipment>
                               <#if orderShipment.quantity?has_content & orderShipment.quantity!=0.0 >
-                  <div>${uiLabelMap.OrderPlannedInReceive} : </b><a target="facility" href="/facility/control/ViewReceiveShipment?shipmentId=${orderShipment.shipmentId!}&externalLoginKey=${externalLoginKey}" class="buttontext" style="font-size: xx-small;">${orderShipment.shipmentId!}</a>:${orderShipment.shipmentItemSeqId!} - ${orderShipment.quantity!}</div>
+                  <div>${uiLabelMap.OrderPlannedInReceive} : </b><a target="facility" href="/facility/control/ViewReceiveShipment?shipmentId=${orderShipment.shipmentId!}" class="buttontext" style="font-size: xx-small;">${orderShipment.shipmentId!}</a>:${orderShipment.shipmentItemSeqId!} - ${orderShipment.quantity!}</div>
                               <#else>
                                   <#assign shipmentItem = orderShipment.getShipmentItem()>
-                  <div>${uiLabelMap.OrderPlannedRejected} : </b><a target="facility" href="/facility/control/ViewReceiveShipment?shipmentId=${orderShipment.shipmentId!}&externalLoginKey=${externalLoginKey}" class="buttontext" style="font-size: xx-small;">${orderShipment.shipmentId!}</a>:${orderShipment.shipmentItemSeqId!} - ${shipmentItem.quantity!}</div>
+                  <div>${uiLabelMap.OrderPlannedRejected} : </b><a target="facility" href="/facility/control/ViewReceiveShipment?shipmentId=${orderShipment.shipmentId!}" class="buttontext" style="font-size: xx-small;">${orderShipment.shipmentId!}</a>:${orderShipment.shipmentItemSeqId!} - ${shipmentItem.quantity!}</div>
                               </#if>
                           </#list>
                       </#if>
@@ -808,7 +808,6 @@ under the License.
                          <input type="hidden" name="primaryShipGroupSeqId" value="${shipGroup.shipGroupSeqId}"/>
                          <input type="hidden" name="shipmentTypeId" value="PURCHASE_SHIPMENT"/>
                          <input type="hidden" name="statusId" value="PURCH_SHIP_CREATED"/>
-                         <input type="hidden" name="externalLoginKey" value="${externalLoginKey}"/>
                        <input type="hidden" name="estimatedShipDate" value="${shipGroup.estimatedShipDate!}"/>
                        <input type="hidden" name="estimatedArrivalDate" value="${shipGroup.estimatedDeliveryDate!}"/>
                          <select name="destinationFacilityId">
@@ -825,14 +824,12 @@ under the License.
                      <form name="quickDropShipOrder_${shipGroup_index}" method="post" action="<@ofbizUrl>quickDropShipOrder</@ofbizUrl>">
                           <input type="hidden" name="orderId" value="${orderId}"/>
                           <input type="hidden" name="shipGroupSeqId" value="${shipGroup.shipGroupSeqId}"/>
-                          <input type="hidden" name="externalLoginKey" value="${externalLoginKey}" />
                       </form>
                       <form name="createShipment3_${shipGroup.shipGroupSeqId}" method="post" action="/facility/control/createShipment">
                           <input type="hidden" name="primaryOrderId" value="${orderId}"/>
                           <input type="hidden" name="primaryShipGroupSeqId" value="${shipGroup.shipGroupSeqId}"/>
                           <input type="hidden" name="shipmentTypeId" value="DROP_SHIPMENT" />
                           <input type="hidden" name="statusId" value="PURCH_SHIP_CREATED" />
-                          <input type="hidden" name="externalLoginKey" value="${externalLoginKey}" />
                       </form>
                  </#if>
                </#if>

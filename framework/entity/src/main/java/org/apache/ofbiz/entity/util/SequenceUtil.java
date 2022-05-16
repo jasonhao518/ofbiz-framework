@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.apache.ofbiz.entity.util;
 
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -39,7 +40,7 @@ import org.apache.ofbiz.entity.transaction.TransactionUtil;
 /**
  * Sequence Utility to get unique sequences from named sequence banks
  */
-public class SequenceUtil {
+public class SequenceUtil implements Serializable{
 
     public static final String module = SequenceUtil.class.getName();
 
@@ -103,7 +104,7 @@ public class SequenceUtil {
         return bank;
     }
 
-    private class SequenceBank {
+    private class SequenceBank implements Serializable{
         public static final long defaultBankSize = 10;
         public static final long maxBankSize = 5000;
         public static final long startSeqId = 10000;

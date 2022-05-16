@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,15 +34,20 @@ import java.util.stream.Collectors;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.servlet.ServletException;
 
+import org.apache.commons.text.StringSubstitutor;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
+import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Valve;
 import org.apache.catalina.authenticator.SingleSignOn;
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.core.DefaultInstanceManager;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardEngine;
 import org.apache.catalina.core.StandardHost;
@@ -50,6 +56,8 @@ import org.apache.catalina.filters.RequestDumperFilter;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.tcp.ReplicationValve;
 import org.apache.catalina.ha.tcp.SimpleTcpCluster;
+import org.apache.catalina.loader.ParallelWebappClassLoader;
+import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.tribes.group.GroupChannel;
@@ -73,11 +81,16 @@ import org.apache.ofbiz.base.util.Debug;
 import org.apache.ofbiz.base.util.UtilValidate;
 import org.apache.ofbiz.entity.util.EntityUtilProperties;
 import org.apache.ofbiz.webapp.WebAppUtil;
+import org.apache.ofbiz.webapp.control.WebAppServletContextListener;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
+import org.apache.tomcat.util.http.CookieProcessorBase;
+import org.apache.tomcat.util.http.Rfc6265CookieProcessor;
 import org.apache.tomcat.util.scan.StandardJarScanner;
+import org.springframework.web.SpringServletContainerInitializer;
+import org.springframework.web.filter.DelegatingFilterProxy;
 import org.xml.sax.SAXException;
 
 /**
@@ -203,6 +216,7 @@ public class CatalinaContainer implements Container {
         // set the JVM Route property (JK/JK2)
         String jvmRoute = ContainerConfig.getPropertyValue(engineConfig, "jvm-route", null);
         if (jvmRoute != null) {
+        	jvmRoute = new StringSubstitutor(System.getenv()).replace(jvmRoute);
             engine.setJvmRoute(jvmRoute);
         }
 
@@ -506,13 +520,24 @@ public class CatalinaContainer implements Container {
         context.setJ2EEServer("OFBiz Container");
         context.setParentClassLoader(Thread.currentThread().getContextClassLoader());
         context.setDocBase(location);
+        CookieProcessorBase cookieProcessor = new Rfc6265CookieProcessor();
+        cookieProcessor.setSameSiteCookies("Lax");
+        context.setCookieProcessor(cookieProcessor);
         context.setReloadable(ContainerConfig.getPropertyValue(configuration, "apps-context-reloadable", false));
         context.setDistributable(contextIsDistributable);
         context.setCrossContext(ContainerConfig.getPropertyValue(configuration, "apps-cross-context", true));
         context.setPrivileged(appInfo.privileged);
         context.getServletContext().setAttribute("_serverId", appInfo.server);
         context.getServletContext().setAttribute("componentName", appInfo.componentConfig.getComponentName());
-
+        WebappLoader loader = new WebappLoader(Thread.currentThread().getContextClassLoader());
+        loader.setLoaderInstance(new ParallelWebappClassLoader(Thread.currentThread().getContextClassLoader()));
+        context.setLoader(loader);
+        Map<String, Map<String, String>> injectionMap = new HashMap<>();
+        InitialContext jndiContext = (InitialContext) ((StandardServer)tomcat.getServer()).getGlobalNamingContext();
+        context.setInstanceManager(new DefaultInstanceManager(jndiContext, injectionMap, context, Thread.currentThread().getContextClassLoader()));
+       
+//        context.setSessionCookiePath("/");
+        
         if (clusterProp != null && contextIsDistributable) {
             context.setManager(prepareClusterManager(clusterProp));
         }
@@ -520,6 +545,25 @@ public class CatalinaContainer implements Container {
         StandardRoot resources = new StandardRoot(context);
         resources.setAllowLinking(true);
         context.setResources(resources);
+        
+        try {
+			new SpringServletContainerInitializer().onStartup(null,context.getServletContext());
+		} catch (ServletException e) {
+			e.printStackTrace();
+		}
+        context.addLifecycleListener(new LifecycleListener() {
+			
+			@Override
+			public void lifecycleEvent(LifecycleEvent event) {
+				// TODO Auto-generated method stub
+				if("before_start".equals(event.getType())) {
+					if(event.getSource() instanceof StandardContext) {
+						((StandardContext)event.getSource()).getServletContext().addListener(WebAppServletContextListener.class);
+					}
+					
+				}
+			}
+		});
 
         JarScanner jarScanner = context.getJarScanner();
         if (jarScanner instanceof StandardJarScanner) {
@@ -527,6 +571,28 @@ public class CatalinaContainer implements Container {
             standardJarScanner.setJarScanFilter(new FilterJars());
             standardJarScanner.setScanClassPath(true);
         }
+
+  
+        FilterDef sessionFilterDef = new FilterDef();
+        sessionFilterDef.setFilterClass(DelegatingFilterProxy.class.getName());
+        sessionFilterDef.setFilterName("springSessionRepositoryFilter");
+        context.addFilterDef(sessionFilterDef);
+
+        FilterMap sessionFilterMap = new FilterMap();
+        sessionFilterMap.setFilterName("springSessionRepositoryFilter");
+        sessionFilterMap.addURLPattern("*");
+        context.addFilterMap(sessionFilterMap);
+        
+
+        FilterDef securityFilterDef = new FilterDef();
+        securityFilterDef.setFilterClass(DelegatingFilterProxy.class.getName());
+        securityFilterDef.setFilterName("springSecurityFilterChain");
+        context.addFilterDef(securityFilterDef);
+
+        FilterMap securityFilterMap = new FilterMap();
+        securityFilterMap.setFilterName("springSecurityFilterChain");
+        securityFilterMap.addURLPattern("*");
+        context.addFilterMap(securityFilterMap);
 
         Map<String, String> initParameters = appInfo.getInitParameters();
         // request dumper filter
@@ -541,7 +607,6 @@ public class CatalinaContainer implements Container {
             requestDumperFilterMap.addURLPattern("*");
             context.addFilterMap(requestDumperFilterMap);
         }
-
         // set the init parameters
         initParameters.entrySet().forEach(entry -> context.addParameter(entry.getKey(), entry.getValue()));
 

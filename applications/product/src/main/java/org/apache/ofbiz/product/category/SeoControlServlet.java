@@ -72,7 +72,7 @@ public class SeoControlServlet extends ControlServlet {
         SeoConfigUtil.init();
     }
     
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doService(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String uri = URLEncoder.encode(request.getRequestURI(), "UTF-8");
         if (request.getAttribute(REQUEST_IN_ALLOW_LIST) != null || request.getAttribute("_jsp_" + uri) != null) {
             if (request.getRequestURI().toLowerCase(Locale.getDefault()).endsWith(".jsp") || request.getRequestURI().toLowerCase(Locale.getDefault()).endsWith(".jspx") ) {

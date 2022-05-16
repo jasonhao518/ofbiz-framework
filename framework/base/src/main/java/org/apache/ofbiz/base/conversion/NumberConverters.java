@@ -451,5 +451,32 @@ public class NumberConverters implements ConverterLoader {
 
         Converters.registerConverter(new GenericNumberToShort<>(Integer.class));
         Converters.registerConverter(new GenericNumberToShort<>(Long.class));
+
+
+        
+        Converters.registerConverter(new StringToBigDecimal());
+        Converters.registerConverter(new StringToBigInteger());
+        Converters.registerConverter(new StringToByte());
+        Converters.registerConverter(new StringToDouble());
+        Converters.registerConverter(new StringToFloat());
+        Converters.registerConverter(new StringToInteger());
+        Converters.registerConverter(new StringToLong());
+        Converters.registerConverter(new StringToShort());
+        
+        Converters.registerConverter(new IntegerToString());
+        Converters.registerConverter(new BigIntegerToString());
+        Converters.registerConverter(new BigDecimalToString());
+        Converters.registerConverter(new ByteToString());
+        Converters.registerConverter(new DoubleToString());
+        Converters.registerConverter(new FloatToString());
+        Converters.registerConverter(new LongToString());
+        Converters.registerConverter(new ShortToString());
+        
+        
+        
+        
+        
+        
+        
     }
 }

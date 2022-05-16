@@ -778,5 +778,50 @@ public class DateTimeConverters implements ConverterLoader {
 
     public void loadConverters() {
         Converters.loadContainedConverters(DateTimeConverters.class);
+
+        Converters.registerConverter(new NumberToTimestamp());
+
+        Converters.registerConverter(new CalendarToDate());
+        Converters.registerConverter(new CalendarToLong());
+        
+        Converters.registerConverter(new CalendarToString());
+        Converters.registerConverter(new CalendarToTimestamp());
+        Converters.registerConverter(new DateToCalendar());
+        Converters.registerConverter(new DateToLong());
+        Converters.registerConverter(new DateToSqlDate());
+        Converters.registerConverter(new DateToString());
+        Converters.registerConverter(new DurationToDouble());
+        Converters.registerConverter(new DurationToFloat());
+        Converters.registerConverter(new DurationToList());
+        Converters.registerConverter(new DurationToLong());
+        Converters.registerConverter(new DurationToSet());
+        Converters.registerConverter(new DurationToString());
+        Converters.registerConverter(new LongToCalendar());
+        Converters.registerConverter(new NumberToDate());
+        Converters.registerConverter(new NumberToDuration());
+        Converters.registerConverter(new NumberToSqlDate());
+        Converters.registerConverter(new NumberToSqlTime());
+        Converters.registerConverter(new NumberToTimestamp());
+        Converters.registerConverter(new SqlDateToDate());
+        Converters.registerConverter(new SqlDateToList());
+        Converters.registerConverter(new SqlDateToSet());
+        Converters.registerConverter(new SqlDateToString());
+        Converters.registerConverter(new SqlDateToTime());
+        Converters.registerConverter(new SqlDateToTimestamp());
+        Converters.registerConverter(new StringToCalendar());
+        Converters.registerConverter(new StringToDate());
+        Converters.registerConverter(new StringToDuration());
+        Converters.registerConverter(new StringToSqlDate());
+        Converters.registerConverter(new StringToSqlTime());
+        Converters.registerConverter(new StringToTimestamp());
+        Converters.registerConverter(new StringToTimeZone());
+        Converters.registerConverter(new TimestampToDate());
+        Converters.registerConverter(new TimestampToList());
+        Converters.registerConverter(new TimestampToSet());
+        Converters.registerConverter(new TimestampToSqlDate());
+        Converters.registerConverter(new TimestampToSqlTime());
+        Converters.registerConverter(new TimestampToString());
+        Converters.registerConverter(new TimeZoneToString());
+    
     }
 }

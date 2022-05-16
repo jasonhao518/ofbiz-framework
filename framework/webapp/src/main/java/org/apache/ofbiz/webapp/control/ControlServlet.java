@@ -18,16 +18,15 @@
  *******************************************************************************/
 package org.apache.ofbiz.webapp.control;
 
-import freemarker.template.Template;
 import java.io.IOException;
 import java.util.Enumeration;
-
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -51,22 +50,32 @@ import org.apache.ofbiz.service.LocalDispatcher;
 import org.apache.ofbiz.webapp.stats.ServerHitBin;
 import org.apache.ofbiz.webapp.stats.VisitHandler;
 import org.apache.ofbiz.widget.renderer.VisualTheme;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.HandlerExecutionChain;
 
 import freemarker.ext.servlet.ServletContextHashModel;
+import freemarker.template.Template;
 
 /**
  * ControlServlet.java - Master servlet for the web application.
  */
 @SuppressWarnings("serial")
-public class ControlServlet extends HttpServlet {
+public class ControlServlet extends DispatcherServlet {
 
     public static final String module = ControlServlet.class.getName();
 
     /**
      * @see javax.servlet.Servlet#init(javax.servlet.ServletConfig)
      */
+    public ControlServlet() {
+    	super(new AnnotationConfigWebApplicationContext());
+    }
+    
     @Override
-    public void init() throws ServletException {
+    public void init(ServletConfig config) throws ServletException {
+    	super.init(config);
         ServletContext ctx = getServletContext();
         if (Debug.infoOn()) {
             String path = ctx.getContextPath();
@@ -76,21 +85,18 @@ public class ControlServlet extends HttpServlet {
 
         // Initialize the request handler.
         RequestHandler.getRequestHandler(ctx);
+        this.setApplicationContext(WebApplicationContextUtils.getWebApplicationContext(ctx));
     }
-    /**
-     * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-     */
-    @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doGet(request, response);
-    }
+    
+
 
     /**
+     * @throws Exception 
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        long requestStartTime = System.currentTimeMillis();
+    public void doService(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    	long requestStartTime = System.currentTimeMillis();
         HttpSession session = request.getSession();
 
         // setup DEFAULT character encoding and content type, this will be overridden in the RequestHandler for view rendering
@@ -208,8 +214,13 @@ public class ControlServlet extends HttpServlet {
 
         String errorPage = null;
         try {
+            HandlerExecutionChain springHandler = this.getHandler(request);
+            if(springHandler!=null) {
+            	this.doDispatch(request, response);
+            }else {
             // the ServerHitBin call for the event is done inside the doRequest method
-            handler.doRequest(request, response, null, userLogin, delegator);
+            	handler.doRequest(request, response, null, userLogin, delegator);
+            }
         } catch (MethodNotAllowedException e) {
             response.setContentType("text/plain");
             response.setCharacterEncoding(request.getCharacterEncoding());

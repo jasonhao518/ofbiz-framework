@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.apache.ofbiz.entity.config.model;
 
+import java.io.Serializable;
+
 import org.apache.ofbiz.base.lang.ThreadSafe;
 import org.apache.ofbiz.entity.GenericEntityConfException;
 import org.w3c.dom.Element;
@@ -28,7 +30,7 @@ import org.w3c.dom.Element;
  * @see <code>entity-config.xsd</code>
  */
 @ThreadSafe
-public final class GroupMap {
+public final class GroupMap implements Serializable{
 
     private final String groupName; // type = xs:string
     private final String datasourceName; // type = xs:string

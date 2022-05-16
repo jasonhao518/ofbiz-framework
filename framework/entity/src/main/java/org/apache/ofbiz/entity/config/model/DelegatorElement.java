@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.apache.ofbiz.entity.config.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ import org.w3c.dom.Element;
  * @see <code>entity-config.xsd</code>
  */
 @ThreadSafe
-public final class DelegatorElement {
+public final class DelegatorElement implements Serializable{
 
     private final String name; // type = xs:string
     private final String entityModelReader; // type = xs:string

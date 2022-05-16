@@ -20,6 +20,8 @@ package org.apache.ofbiz.base.conversion;
 
 import java.util.Locale;
 
+import org.apache.ofbiz.base.conversion.NumberConverters.ShortToString;
+
 /** Boolean Converter classes. */
 public class BooleanConverters implements ConverterLoader {
     public static class BooleanToInteger extends AbstractConverter<Boolean, Integer> {
@@ -76,5 +78,12 @@ public class BooleanConverters implements ConverterLoader {
 
     public void loadConverters() {
         Converters.loadContainedConverters(BooleanConverters.class);
+        Converters.registerConverter(new BooleanToInteger());
+        Converters.registerConverter(new BooleanToList());
+        Converters.registerConverter(new BooleanToSet());
+        Converters.registerConverter(new BooleanToString());
+        Converters.registerConverter(new IntegerToBoolean());
+        Converters.registerConverter(new StringToBoolean());
+        
     }
 }

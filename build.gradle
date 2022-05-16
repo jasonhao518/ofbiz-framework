@@ -128,6 +128,8 @@ allprojects {
 		all*.exclude group: 'org.apache.tomcat.embed', module: 'tomcat-embed-websocket'
 		all*.exclude group: 'org.apache.tomcat.embed', module: 'tomcat-embed-core'
 		all*.exclude group: 'org.eclipse.birt.runtime.3_7_1', module: 'org.apache.commons.codec'
+		all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+		
 	}
     repositories{
         mavenCentral()
@@ -250,6 +252,7 @@ dependencies {
 	compile "org.springframework.boot:spring-boot-starter-security:${springBootVersion}"
 	compile "org.springframework.boot:spring-boot-autoconfigure:${springBootVersion}"
 	compile "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}"
+	implementation "org.springframework.boot:spring-boot-starter-freemarker:${springBootVersion}"
 	
 	compileOnly "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}"
 	compileOnly "javax.servlet:javax.servlet-api:4.0.0"
@@ -260,6 +263,7 @@ dependencies {
 	compile "org.springframework:spring-orm:${springVersion}"
 	compile 'org.springframework.security:spring-security-oauth2-client:5.6.1'
 	compile 'org.springframework.cloud:spring-cloud-gateway-mvc:3.1.0'
+	compile 'dev.samstevens.totp:totp:1.7.1'
 	
 	compile "com.google.guava:guava:26.0-jre"
 	compile "org.springframework.boot:spring-boot-starter-cache:${springBootVersion}"
@@ -268,6 +272,7 @@ dependencies {
 	compile 'org.springframework.session:spring-session-data-redis:2.6.1'
 	compile "org.springframework.boot:spring-boot-starter-oauth2-resource-server:${springBootVersion}"
     compile 'mysql:mysql-connector-java:8.0.28'
+    compile "org.springframework.boot:spring-boot-starter-log4j2:${springBootVersion}"
 
 	compile 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
 	
@@ -1246,7 +1251,7 @@ new File("${gradle.getGradleUserHomeDir().getAbsolutePath()}/daemon/${gradle.get
 }
 
 jib{
-  to.image = ''
+  to.image = 'jasonhao123/ofbiz:backend18.12.1'
   extraDirectories {
     paths {
 
@@ -1254,8 +1259,8 @@ jib{
         // copies only .txt files except for 'hidden.txt' at the source root
         from = './'
         into = '/app'
-        includes = ['applications/**', 'framework/**','themes/**','plugins/**','runtime/**']
-        excludes = ['*.java']
+        includes = ['**/*.woff','**/*.woff2','**/*.map','**/*.gif','**/*.svg','**/*.png','**/*.ico','**/*.less','**/*.ftl','**/*.xsd','**/*.html','**/*.xml', '**/*.properties','**/*.groovy','**/*.js','**/*.css','runtime/**','**/*.jks','**/META-INF/services/*']
+        excludes = ['**/*.java']
       }
     }
   }

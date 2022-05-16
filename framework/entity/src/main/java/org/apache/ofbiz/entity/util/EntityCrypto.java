@@ -53,18 +53,25 @@ public final class EntityCrypto {
 
     private final Delegator delegator;
     private final ConcurrentMap<String, byte[]> keyMap = new ConcurrentHashMap<String, byte[]>();
-    private final StorageHandler[] handlers;
+    private transient StorageHandler[] handlers;
+    private final byte[] kek;
 
     public EntityCrypto(Delegator delegator, String kekText) throws EntityCryptoException {
         this.delegator = delegator;
-        byte[] kek;
         kek = UtilValidate.isNotEmpty(kekText) ? Base64.decodeBase64(kekText) : null;
-        handlers = new StorageHandler[] {
-            new ShiroStorageHandler(kek),
-            new SaltedBase64StorageHandler(kek),
-            NormalHashStorageHandler,
-            OldFunnyHashStorageHandler,
-        };
+
+    }
+    
+    public StorageHandler[] getHandlers() throws EntityCryptoException {
+    	if(handlers ==  null) {
+    		handlers = new StorageHandler[] {
+    	            new ShiroStorageHandler(kek),
+    	            new SaltedBase64StorageHandler(kek),
+    	            NormalHashStorageHandler,
+    	            OldFunnyHashStorageHandler,
+    	        };
+    	}
+    	return handlers;
     }
 
     public void clearKeyCache() {
@@ -80,11 +87,11 @@ public final class EntityCrypto {
     /** Encrypts an Object into an encrypted hex encoded String */
     public String encrypt(String keyName, EncryptMethod encryptMethod, Object obj) throws EntityCryptoException {
         try {
-            byte[] key = this.findKey(keyName, handlers[0]);
+            byte[] key = this.findKey(keyName, getHandlers()[0]);
             if (key == null) {
                 EntityCryptoException caught = null;
                 try {
-                    this.createKey(keyName, handlers[0], encryptMethod);
+                    this.createKey(keyName, getHandlers()[0], encryptMethod);
                 } catch (EntityCryptoException e) {
                     // either a database read error, or a duplicate key insert
                     // if the latter, try to fetch the value created by the
@@ -92,7 +99,7 @@ public final class EntityCrypto {
                     caught = e;
                 } finally {
                     try {
-                        key = this.findKey(keyName, handlers[0]);
+                        key = this.findKey(keyName, getHandlers()[0]);
                     } catch (EntityCryptoException e) {
                         // this is bad, couldn't lookup the value, some bad juju
                         // is occurring; rethrow the original exception if available
@@ -104,7 +111,7 @@ public final class EntityCrypto {
                     }
                 }
             }
-            return handlers[0].encryptValue(encryptMethod, key, UtilObject.getBytes(obj));
+            return getHandlers()[0].encryptValue(encryptMethod, key, UtilObject.getBytes(obj));
         } catch (GeneralException e) {
             throw new EntityCryptoException(e);
         }
@@ -123,7 +130,7 @@ public final class EntityCrypto {
     /** Decrypts a hex encoded String into an Object */
     public Object decrypt(String keyName, EncryptMethod encryptMethod, String encryptedString) throws EntityCryptoException {
         try {
-            return doDecrypt(keyName, encryptMethod, encryptedString, handlers[0]);
+            return doDecrypt(keyName, encryptMethod, encryptedString, getHandlers()[0]);
         } catch (Exception e) {
             /*
             When the field is encrypted with the old algorithm (3-DES), the new Shiro code will fail to decrypt it (using AES) and then it will
@@ -131,10 +138,10 @@ public final class EntityCrypto {
             For backward compatibility we want instead to catch the exception and decrypt the code using the old algorithm.
              */
             Debug.logInfo("Decrypt with DES key from standard key name hash failed, trying old/funny variety of key name hash", module);
-            for (int i = 1; i < handlers.length; i++) {
+            for (int i = 1; i < getHandlers().length; i++) {
                 try {
                     // try using the old/bad hex encoding approach; this is another path the code may take, ie if there is an exception thrown in decrypt
-                    return doDecrypt(keyName, encryptMethod, encryptedString, handlers[i]);
+                    return doDecrypt(keyName, encryptMethod, encryptedString, getHandlers()[i]);
                 } catch (GeneralException e1) {
                     // NOTE: this throws the original exception back, not the new one if it fails using the other approach
                     //throw new EntityCryptoException(e);
